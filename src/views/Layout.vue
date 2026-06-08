@@ -3,10 +3,10 @@
     <!-- 侧边栏 -->
     <el-aside :width="isCollapse ? '64px' : '240px'" class="sidebar">
       <div class="logo-container" :class="{ collapse: isCollapse }">
-        <el-icon v-if="isCollapse" :size="28" color="#A70101"><Stamp /></el-icon>
+        <img v-if="isCollapse" src="@/assets/logo.png" class="logo-img-small" alt="logo" />
         <template v-else>
-          <el-icon :size="32" color="#A70101"><Stamp /></el-icon>
-          <span class="logo-text">民族共同体</span>
+          <img src="@/assets/logo.png" class="logo-img" alt="logo" />
+          <span class="logo-text">铸牢中华民族<br/>共同体意识</span>
         </template>
       </div>
 
@@ -148,8 +148,8 @@ const menuRoutes = computed(() => {
       path: '/persons',
       meta: { title: '典型引领', icon: 'Medal' },
       children: [
-        { path: 'list', meta: { title: '人物列表', icon: 'List' } },
-        { path: 'create', meta: { title: '新建人物', icon: 'UserFilled' } }
+        { path: 'person', meta: { title: '先进个人', icon: 'User' } },
+        { path: 'group', meta: { title: '先进集体', icon: 'OfficeBuilding' } }
       ]
     },
     {
@@ -161,12 +161,12 @@ const menuRoutes = computed(() => {
       ]
     },
     {
-      path: '/messages',
-      meta: { title: '交流互动', icon: 'ChatDotRound' }
-    },
-    {
       path: '/resources',
-      meta: { title: '资源中心', icon: 'Folder' }
+      meta: { title: '资源中心', icon: 'Folder' },
+      children: [
+        { path: 'topic/list', meta: { title: '专题资源', icon: 'Collection' } },
+        { path: 'software/list', meta: { title: '软件资源', icon: 'Monitor' } }
+      ]
     },
     {
       path: '/audit',
@@ -187,16 +187,118 @@ const menuRoutes = computed(() => {
 // 当前激活菜单
 const activeMenu = computed(() => {
   const { path } = route
+
+  // 如果是新建/编辑/详情页，返回对应的列表页路径
+  const pathSegments = path.split('/').filter(Boolean)
+  const lastSegment = pathSegments[pathSegments.length - 1]
+
+  // 判断是否是新建/编辑/详情页
+  if (['create'].includes(lastSegment) || lastSegment.startsWith('edit') || lastSegment.startsWith('detail')) {
+    // 典型引领特殊处理：根据 query.type 返回对应的列表路径
+    if (path.includes('/persons/')) {
+      const type = route.query.type
+      return type === 'group' ? '/persons/group' : '/persons/person'
+    }
+
+    // 资源中心特殊处理
+    if (path.includes('/resources/topic/')) {
+      return '/resources/topic/list'
+    }
+    if (path.includes('/resources/software/')) {
+      return '/resources/software/list'
+    }
+
+    // 实践育人特殊处理
+    if (path.includes('/practice/campus/')) {
+      return '/practice/campus/list'
+    }
+    if (path.includes('/practice/social/')) {
+      return '/practice/social/list'
+    }
+
+    // 其他模块：时政要闻、文化传承等
+    if (path.includes('/articles/')) {
+      return '/articles/list'
+    }
+    if (path.includes('/culture/')) {
+      return '/culture/list'
+    }
+  }
+
   return path
 })
 
 // 面包屑导航
 const breadcrumbs = computed(() => {
   const matched = route.matched.filter(item => item.meta && item.meta.title)
-  return matched.map(item => ({
-    path: item.path,
-    title: item.meta.title
-  }))
+  const result = []
+
+  // 遍历匹配的路由
+  matched.forEach((item, index) => {
+    result.push({
+      path: item.path,
+      title: item.meta.title
+    })
+
+    // 如果是最后一级且是新建/编辑/详情页，尝试插入列表页层级
+    if (index === matched.length - 1) {
+      const pathSegments = route.path.split('/').filter(Boolean)
+      const lastSegment = pathSegments[pathSegments.length - 1]
+
+      // 判断是否是新建/编辑/详情页
+      if (['create', 'edit', 'detail'].some(key => lastSegment.includes(key))) {
+        // 尝试找到列表页路由
+        let listRoute = null
+
+        // 从前一个父级的 children 中找列表页
+        if (matched.length >= 2) {
+          const parent = matched[matched.length - 2]
+          if (parent.children) {
+            listRoute = parent.children.find(child =>
+              child.path === 'list' ||
+              child.path === 'person' ||
+              child.path === 'group' ||
+              child.name?.toLowerCase().includes('list')
+            )
+          }
+        }
+
+        // 如果找到列表页，插入到最后一级之前
+        if (listRoute && listRoute.meta?.title) {
+          // 特殊处理：如果是典型引领，根据 query.type 判断是先进个人还是先进集体
+          let listTitle = listRoute.meta.title
+          let listPath = listRoute.path
+
+          if (route.path.includes('/persons/')) {
+            const type = route.query.type
+            if (type === 'group') {
+              // 先进集体
+              const groupRoute = matched[matched.length - 2]?.children?.find(c => c.path === 'group')
+              if (groupRoute) {
+                listTitle = groupRoute.meta.title
+                listPath = '/persons/group'
+              }
+            } else {
+              // 先进个人
+              const personRoute = matched[matched.length - 2]?.children?.find(c => c.path === 'person')
+              if (personRoute) {
+                listTitle = personRoute.meta.title
+                listPath = '/persons/person'
+              }
+            }
+          }
+
+          // 插入列表页到倒数第二位
+          result.splice(result.length - 1, 0, {
+            path: listPath,
+            title: listTitle
+          })
+        }
+      }
+    }
+  })
+
+  return result
 })
 
 // 切换侧边栏折叠
@@ -247,11 +349,23 @@ const handleCommand = async (command) => {
     background: #fff;
     transition: all 0.3s;
 
+    .logo-img {
+      height: 42px;
+      width: auto;
+    }
+
+    .logo-img-small {
+      height: 36px;
+      width: auto;
+    }
+
     .logo-text {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: bold;
       color: #A70101;
-      white-space: nowrap;
+      white-space: normal;
+      line-height: 1.4;
+      text-align: left;
     }
 
     &.collapse {

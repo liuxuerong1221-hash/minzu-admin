@@ -1,5 +1,6 @@
 <template>
   <div class="culture-detail-container">
+
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
@@ -373,4 +374,3 @@ onMounted(() => {
   }
 }
 </style>
-

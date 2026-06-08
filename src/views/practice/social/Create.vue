@@ -1,5 +1,6 @@
 <template>
   <div class="social-practice-create-container">
+
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
@@ -121,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import RichEditor from '@/components/RichEditor.vue'
@@ -189,6 +190,63 @@ const handleSubmit = async () => {
     }
   })
 }
+
+// 初始化数据（编辑模式）
+const initData = () => {
+  if (isEdit.value) {
+    const practiceId = route.params.id
+
+    // 模拟数据
+    const mockData = {
+      1: {
+        id: 1,
+        title: '社区志愿服务活动',
+        type: '志愿服务',
+        time: '2026-05-20',
+        location: '某社区服务中心',
+        participants: 28,
+        briefIntro: '组织学生深入社区开展志愿服务，践行民族团结理念。',
+        cover: '',
+        content: '<p>志愿者们深入社区，为居民提供便民服务，增进民族团结...</p>',
+        isRecommend: true,
+        sortOrder: 100
+      },
+      2: {
+        id: 2,
+        title: '走访少数民族家庭实践活动',
+        type: '社会调研',
+        time: '2026-06-05',
+        location: '某乡镇',
+        participants: 15,
+        briefIntro: '组织学生走访少数民族家庭，了解民族文化和生活习俗。',
+        cover: '',
+        content: '<p>通过实地走访，学生们深入了解了少数民族的生活和文化...</p>',
+        isRecommend: false,
+        sortOrder: 90
+      }
+    }
+
+    const data = mockData[practiceId]
+    if (data) {
+      Object.assign(form, {
+        title: data.title || '',
+        type: data.type || '',
+        time: data.time || '',
+        location: data.location || '',
+        participants: data.participants || 0,
+        briefIntro: data.briefIntro || '',
+        cover: data.cover || '',
+        content: data.content || '',
+        isRecommend: data.isRecommend ?? false,
+        sortOrder: data.sortOrder ?? 100
+      })
+    }
+  }
+}
+
+onMounted(() => {
+  initData()
+})
 </script>
 
 <style lang="scss" scoped>

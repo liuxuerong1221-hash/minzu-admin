@@ -1,5 +1,6 @@
 <template>
   <div class="campus-practice-detail-container">
+
     <el-card shadow="never">
       <template #header>
         <div class="card-header">

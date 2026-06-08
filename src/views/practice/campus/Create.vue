@@ -1,5 +1,6 @@
 <template>
   <div class="campus-practice-create-container">
+
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
@@ -121,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import RichEditor from '@/components/RichEditor.vue'
@@ -189,6 +190,63 @@ const handleSubmit = async () => {
     }
   })
 }
+
+// 初始化数据（编辑模式）
+const initData = () => {
+  if (isEdit.value) {
+    const practiceId = route.params.id
+
+    // 模拟数据
+    const mockData = {
+      1: {
+        id: 1,
+        title: '民族团结进步主题班会',
+        type: '主题班会',
+        time: '2026-05-15',
+        location: '教学楼301教室',
+        participants: 45,
+        briefIntro: '开展民族团结进步主题班会，增强学生的民族团结意识。',
+        cover: '',
+        content: '<p>本次主题班会围绕铸牢中华民族共同体意识展开，通过讲解、讨论等形式...</p>',
+        isRecommend: true,
+        sortOrder: 100
+      },
+      2: {
+        id: 2,
+        title: '民族文化节活动',
+        type: '文化活动',
+        time: '2026-06-01',
+        location: '学校操场',
+        participants: 320,
+        briefIntro: '举办校园民族文化节，展示各民族优秀文化。',
+        cover: '',
+        content: '<p>民族文化节活动精彩纷呈，包括民族歌舞表演、传统手工艺展示...</p>',
+        isRecommend: true,
+        sortOrder: 90
+      }
+    }
+
+    const data = mockData[practiceId]
+    if (data) {
+      Object.assign(form, {
+        title: data.title || '',
+        type: data.type || '',
+        time: data.time || '',
+        location: data.location || '',
+        participants: data.participants || 0,
+        briefIntro: data.briefIntro || '',
+        cover: data.cover || '',
+        content: data.content || '',
+        isRecommend: data.isRecommend ?? false,
+        sortOrder: data.sortOrder ?? 100
+      })
+    }
+  }
+}
+
+onMounted(() => {
+  initData()
+})
 </script>
 
 <style lang="scss" scoped>

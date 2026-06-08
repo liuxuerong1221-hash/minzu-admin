@@ -63,56 +63,38 @@ const routes = [
       {
         path: 'persons',
         name: 'Persons',
-        redirect: '/persons/list',
-        meta: { title: '典型引领', icon: 'User' },
+        redirect: '/persons/person',
+        meta: { title: '典型引领', icon: 'Medal' },
         children: [
           {
-            path: 'list',
+            path: 'person',
             name: 'PersonList',
             component: () => import('@/views/persons/List.vue'),
-            meta: { title: '先进个人', icon: 'List' }
+            meta: { title: '先进个人', icon: 'User' }
+          },
+          {
+            path: 'group',
+            name: 'GroupList',
+            component: () => import('@/views/persons/List.vue'),
+            meta: { title: '先进集体', icon: 'OfficeBuilding' }
           },
           {
             path: 'create',
             name: 'PersonCreate',
             component: () => import('@/views/persons/Create.vue'),
-            meta: { title: '新建先进个人', icon: 'UserFilled', hidden: true }
+            meta: { title: '新建', hidden: true }
           },
           {
             path: 'edit/:id',
             name: 'PersonEdit',
             component: () => import('@/views/persons/Create.vue'),
-            meta: { title: '编辑先进个人', icon: 'UserFilled', hidden: true }
+            meta: { title: '编辑', hidden: true }
           },
           {
             path: 'detail/:id',
             name: 'PersonDetail',
             component: () => import('@/views/persons/Detail.vue'),
-            meta: { title: '先进个人详情', icon: 'View', hidden: true }
-          },
-          {
-            path: '/groups/list',
-            name: 'GroupList',
-            component: () => import('@/views/groups/List.vue'),
-            meta: { title: '先进集体', icon: 'OfficeBuilding' }
-          },
-          {
-            path: '/groups/create',
-            name: 'GroupCreate',
-            component: () => import('@/views/groups/Create.vue'),
-            meta: { title: '新建先进集体', icon: 'OfficeBuilding', hidden: true }
-          },
-          {
-            path: '/groups/edit/:id',
-            name: 'GroupEdit',
-            component: () => import('@/views/groups/Create.vue'),
-            meta: { title: '编辑先进集体', icon: 'OfficeBuilding', hidden: true }
-          },
-          {
-            path: '/groups/detail/:id',
-            name: 'GroupDetail',
-            component: () => import('@/views/groups/Detail.vue'),
-            meta: { title: '先进集体详情', icon: 'View', hidden: true }
+            meta: { title: '详情', hidden: true }
           }
         ]
       },
@@ -218,8 +200,60 @@ const routes = [
       {
         path: 'resources',
         name: 'Resources',
-        component: () => import('@/views/resources/Index.vue'),
-        meta: { title: '资源中心', icon: 'FolderOpened' }
+        redirect: '/resources/topic/list',
+        meta: { title: '资源中心', icon: 'FolderOpened' },
+        children: [
+          // 专题资源
+          {
+            path: 'topic/list',
+            name: 'TopicResourceList',
+            component: () => import('@/views/resources/topic/List.vue'),
+            meta: { title: '专题资源', icon: 'Collection' }
+          },
+          {
+            path: 'topic/create',
+            name: 'TopicResourceCreate',
+            component: () => import('@/views/resources/topic/Create.vue'),
+            meta: { title: '新建专题资源', icon: 'EditPen', hidden: true }
+          },
+          {
+            path: 'topic/edit/:id',
+            name: 'TopicResourceEdit',
+            component: () => import('@/views/resources/topic/Create.vue'),
+            meta: { title: '编辑专题资源', icon: 'EditPen', hidden: true }
+          },
+          {
+            path: 'topic/detail/:id',
+            name: 'TopicResourceDetail',
+            component: () => import('@/views/resources/topic/Detail.vue'),
+            meta: { title: '专题资源详情', icon: 'View', hidden: true }
+          },
+          // 软件资源
+          {
+            path: 'software/list',
+            name: 'SoftwareResourceList',
+            component: () => import('@/views/resources/software/List.vue'),
+            meta: { title: '软件资源', icon: 'Monitor' }
+          },
+          {
+            path: 'software/create',
+            name: 'SoftwareResourceCreate',
+            component: () => import('@/views/resources/software/Create.vue'),
+            meta: { title: '新建软件资源', icon: 'EditPen', hidden: true }
+          },
+          {
+            path: 'software/edit/:id',
+            name: 'SoftwareResourceEdit',
+            component: () => import('@/views/resources/software/Create.vue'),
+            meta: { title: '编辑软件资源', icon: 'EditPen', hidden: true }
+          },
+          {
+            path: 'software/detail/:id',
+            name: 'SoftwareResourceDetail',
+            component: () => import('@/views/resources/software/Detail.vue'),
+            meta: { title: '软件资源详情', icon: 'View', hidden: true }
+          }
+        ]
       },
       // 审核管理
       {

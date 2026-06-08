@@ -1,5 +1,6 @@
 <template>
   <div class="culture-create-container">
+
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
@@ -178,12 +179,42 @@ const handleSubmit = async () => {
 
 const initData = () => {
   if (isEdit.value) {
-    Object.assign(form, {
-      title: '塞外长城驿站——历史的见证',
-      category: '塞外长城驿站',
-      briefIntro: '这是一段关于塞外长城驿站的简介内容。',
-      content: '<p>这里是文化内容的详细介绍...</p>'
-    })
+    const cultureId = route.params.id
+
+    // 模拟数据
+    const mockData = {
+      1: {
+        id: 1,
+        title: '塞外长城驿站——历史的见证',
+        category: '塞外长城驿站',
+        briefIntro: '塞外长城驿站是古代丝绸之路上的重要驿站，承载着厚重的历史文化。',
+        content: '<p>塞外长城驿站位于古代丝绸之路的关键节点，见证了中华民族各族人民的交流交往交融...</p>'
+      },
+      2: {
+        id: 2,
+        title: '塞上江南——宁夏文化概览',
+        category: '塞上江南文化',
+        briefIntro: '宁夏作为塞上江南，拥有独特的回族文化和黄河文化融合特色。',
+        content: '<p>宁夏回族自治区地处黄河中上游，被誉为"塞上江南"，这里的文化底蕴深厚...</p>'
+      },
+      3: {
+        id: 3,
+        title: '民族传统手工艺传承与发展',
+        category: '传统工艺',
+        briefIntro: '探讨少数民族传统手工艺在现代社会的传承与创新发展。',
+        content: '<p>少数民族传统手工艺是中华优秀传统文化的重要组成部分，包含刺绣、编织、银饰等...</p>'
+      }
+    }
+
+    const data = mockData[cultureId]
+    if (data) {
+      Object.assign(form, {
+        title: data.title || '',
+        category: data.category || '',
+        briefIntro: data.briefIntro || '',
+        content: data.content || ''
+      })
+    }
   }
 }
 
@@ -275,5 +306,3 @@ onMounted(() => {
   }
 }
 </style>
-
-
