@@ -65,15 +65,59 @@
     <!-- 列表 -->
     <el-card class="table-card" shadow="never">
       <el-tabs v-model="activeTab" @tab-change="handleTabChange">
-        <el-tab-pane label="待审核" name="待审核">
-          <el-badge :value="pendingCount" class="tab-badge" />
+        <el-tab-pane name="待审核">
+          <template #label>
+            <span class="tab-label">
+              待审核
+              <span class="tab-count">{{ pendingCount }}</span>
+            </span>
+          </template>
         </el-tab-pane>
         <el-tab-pane label="已通过" name="已通过" />
         <el-tab-pane label="已驳回" name="已驳回" />
         <el-tab-pane label="全部" name="" />
       </el-tabs>
 
-      <el-table :data="tableData" v-loading="loading" stripe>
+      <!-- 批量操作工具条 -->
+      <div v-if="activeTab === '待审核' || activeTab === ''" class="batch-toolbar">
+        <div class="batch-info">
+          <el-checkbox
+            :model-value="isAllSelected"
+            :indeterminate="isIndeterminate"
+            @change="handleSelectAll"
+          >
+            全选当前页
+          </el-checkbox>
+          <span v-if="selectedRows.length > 0" class="selected-count">
+            已选择 <span class="count-num">{{ selectedRows.length }}</span> 项
+          </span>
+        </div>
+        <div class="batch-actions">
+          <el-button
+            type="success"
+            :disabled="!hasPendingSelected"
+            @click="handleBatchApprove"
+          >
+            <el-icon><CircleCheck /></el-icon><span>批量通过</span>
+          </el-button>
+          <el-button
+            type="danger"
+            :disabled="!hasPendingSelected"
+            @click="handleBatchReject"
+          >
+            <el-icon><CircleClose /></el-icon><span>批量驳回</span>
+          </el-button>
+        </div>
+      </div>
+
+      <el-table
+        ref="tableRef"
+        :data="tableData"
+        v-loading="loading"
+        stripe
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="50" :selectable="canSelect" />
         <el-table-column prop="title" label="内容标题" min-width="250" show-overflow-tooltip />
         <el-table-column prop="module" label="所属模块" width="110">
           <template #default="{ row }">
@@ -148,6 +192,35 @@
         <el-button type="primary" @click="handleSubmitAudit">提交</el-button>
       </template>
     </el-dialog>
+
+    <!-- 批量审核对话框 -->
+    <el-dialog v-model="batchDialogVisible" :title="batchDialogTitle" width="600px">
+      <el-alert
+        :title="`将对已选中的 ${selectedRows.filter(r => r.status === '待审核').length} 项内容执行${batchAuditForm.result}操作`"
+        :type="batchAuditForm.result === '通过' ? 'success' : 'warning'"
+        :closable="false"
+        style="margin-bottom: 16px;"
+      />
+      <el-form :model="batchAuditForm" label-width="80px">
+        <el-form-item label="审核意见">
+          <el-input
+            v-model="batchAuditForm.comment"
+            type="textarea"
+            :rows="4"
+            :placeholder="batchAuditForm.result === '通过' ? '选填，可输入审核意见（将应用到所有选中项）' : '必填，请说明驳回原因（将应用到所有选中项）'"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="batchDialogVisible = false">取消</el-button>
+        <el-button
+          :type="batchAuditForm.result === '通过' ? 'success' : 'danger'"
+          @click="handleSubmitBatchAudit"
+        >
+          确认{{ batchAuditForm.result }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -168,6 +241,46 @@ const stats = ref([
 ])
 
 const pendingCount = computed(() => stats.value[0].value)
+
+// 批量操作相关状态
+const tableRef = ref(null)
+const selectedRows = ref([])
+
+// 仅"待审核"行可被勾选
+const canSelect = (row) => row.status === '待审核'
+
+// 当前页中可选行
+const selectableRows = computed(() => tableData.value.filter(canSelect))
+
+const isAllSelected = computed(() =>
+  selectableRows.value.length > 0 &&
+  selectedRows.value.length === selectableRows.value.length
+)
+
+const isIndeterminate = computed(() =>
+  selectedRows.value.length > 0 &&
+  selectedRows.value.length < selectableRows.value.length
+)
+
+// 是否有可批量操作的"待审核"项
+const hasPendingSelected = computed(() =>
+  selectedRows.value.some(row => row.status === '待审核')
+)
+
+const handleSelectionChange = (rows) => {
+  selectedRows.value = rows
+}
+
+const handleSelectAll = (checked) => {
+  if (!tableRef.value) return
+  if (checked) {
+    selectableRows.value.forEach(row => {
+      tableRef.value.toggleRowSelection(row, true)
+    })
+  } else {
+    tableRef.value.clearSelection()
+  }
+}
 
 const tableData = ref([
   {
@@ -349,6 +462,62 @@ const handleSubmitAudit = () => {
   fetchData()
 }
 
+// 批量审核 - 共用对话框
+const batchDialogVisible = ref(false)
+const batchAuditForm = reactive({ result: '通过', comment: '' })
+const batchDialogTitle = computed(() =>
+  batchAuditForm.result === '通过' ? '批量审核通过' : '批量审核驳回'
+)
+
+const handleBatchApprove = () => {
+  batchAuditForm.result = '通过'
+  batchAuditForm.comment = ''
+  batchDialogVisible.value = true
+}
+
+const handleBatchReject = () => {
+  batchAuditForm.result = '驳回'
+  batchAuditForm.comment = ''
+  batchDialogVisible.value = true
+}
+
+const handleSubmitBatchAudit = () => {
+  if (batchAuditForm.result === '驳回' && !batchAuditForm.comment.trim()) {
+    ElMessage.warning('批量驳回时必须填写驳回原因')
+    return
+  }
+
+  const pendingItems = selectedRows.value.filter(row => row.status === '待审核')
+  if (pendingItems.length === 0) {
+    ElMessage.warning('没有可审核的内容')
+    batchDialogVisible.value = false
+    return
+  }
+
+  const statusText = batchAuditForm.result === '通过' ? '已通过' : '已驳回'
+  const now = new Date().toLocaleString('zh-CN')
+
+  pendingItems.forEach(row => {
+    row.status = statusText
+    row.reviewer = '当前审核员'
+    row.reviewTime = now
+  })
+
+  // 更新统计
+  stats.value[0].value = Math.max(0, stats.value[0].value - pendingItems.length)
+  stats.value[1].value += pendingItems.length
+  if (batchAuditForm.result === '通过') {
+    stats.value[2].value += pendingItems.length
+  } else {
+    stats.value[3].value += pendingItems.length
+  }
+
+  ElMessage.success(`批量${batchAuditForm.result}成功，共处理 ${pendingItems.length} 项`)
+  batchDialogVisible.value = false
+  tableRef.value?.clearSelection()
+  fetchData()
+}
+
 onMounted(() => { fetchData() })
 </script>
 
@@ -424,8 +593,62 @@ onMounted(() => { fetchData() })
     justify-content: flex-end;
   }
 
+  .batch-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    background: #f5f7fa;
+    border-radius: 6px;
+    border: 1px solid #e4e7ed;
+
+    .batch-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .selected-count {
+        font-size: 14px;
+        color: #606266;
+
+        .count-num {
+          color: #A70101;
+          font-weight: 600;
+          margin: 0 2px;
+        }
+      }
+    }
+
+    .batch-actions {
+      display: flex;
+      gap: 8px;
+    }
+  }
+
   :deep(.el-tabs__nav-wrap::after) {
     display: none;
+  }
+
+  .tab-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    .tab-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 18px;
+      padding: 0 6px;
+      background: #f56c6c;
+      color: #fff;
+      border-radius: 9px;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: normal;
+    }
   }
 }
 </style>
