@@ -1,0 +1,1 @@
+import{S as e}from"./SimplePage-Dj3W4Ya7.js";import{o as t,j as o}from"./index-BnoEYLQS.js";const i={__name:"Roles",setup(r){return(a,c)=>(t(),o(e,{title:"角色管理",description:"角色管理功能开发中...",actionText:"新建"}))}};export{i as default};

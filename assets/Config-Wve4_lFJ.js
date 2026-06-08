@@ -1,0 +1,1 @@
+import{S as e}from"./SimplePage-Dj3W4Ya7.js";import{o,j as t}from"./index-BnoEYLQS.js";const i={__name:"Config",setup(r){return(a,c)=>(o(),t(e,{title:"网站配置",description:"网站配置功能开发中..."}))}};export{i as default};
