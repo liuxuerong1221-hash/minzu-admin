@@ -1,1 +1,0 @@
-import{S as e}from"./SimplePage-BLozy8Hn.js";import{o as t,j as o}from"./index-D4u2-FgP.js";const n={__name:"Index",setup(r){return(a,c)=>(t(),o(e,{title:"审核管理",description:"审核管理功能开发中..."}))}};export{n as default};
