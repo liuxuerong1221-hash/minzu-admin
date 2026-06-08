@@ -1,1 +1,0 @@
-import{S as e}from"./SimplePage-TbztMfWp.js";import{o as t,j as o}from"./index-D_qhPEsz.js";const i={__name:"Users",setup(r){return(a,s)=>(t(),o(e,{title:"用户管理",description:"用户管理功能开发中...",actionText:"新建"}))}};export{i as default};

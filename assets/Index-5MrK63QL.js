@@ -1,0 +1,1 @@
+import{S as e}from"./SimplePage-BLozy8Hn.js";import{o as t,j as o}from"./index-D4u2-FgP.js";const s={__name:"Index",setup(r){return(a,c)=>(t(),o(e,{title:"资源中心",description:"资源管理功能开发中...",actionText:"上传资源"}))}};export{s as default};

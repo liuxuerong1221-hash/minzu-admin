@@ -1,0 +1,1 @@
+import{S as e}from"./SimplePage-BLozy8Hn.js";import{o as t,j as o}from"./index-D4u2-FgP.js";const i={__name:"Users",setup(r){return(a,s)=>(t(),o(e,{title:"用户管理",description:"用户管理功能开发中...",actionText:"新建"}))}};export{i as default};
