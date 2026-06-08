@@ -297,12 +297,122 @@ const handleSubmit = async () => {
 // 初始化数据（编辑模式）
 const initData = () => {
   if (isEdit.value) {
-    // 模拟获取文章数据
-    Object.assign(form, {
-      title: '示例文章标题',
-      summary: '这是一篇示例文章的摘要内容，用于展示编辑功能。',
-      content: '这里是文章的正文内容...'
-    })
+    const articleId = route.params.id
+
+    // 模拟从API获取文章数据 - 实际应用中替换为真实API调用
+    // 这里使用与 List.vue 中相同的模拟数据
+    const mockData = [
+      {
+        id: 1,
+        title: '十四届全国人大常委会第二十一次会议在京举行',
+        subtitle: '学习贯彻党的二十届三中全会精神',
+        category: '会议精神',
+        tags: ['全国人大', '会议精神', '重要讲话'],
+        author: '张三',
+        source: '新华社',
+        sourceUrl: 'https://example.com',
+        cover: '',
+        summary: '十四届全国人大常委会第二十一次会议在京举行，深入学习贯彻党的二十届三中全会精神，听取和审议有关工作报告。',
+        content: '<p>十四届全国人大常委会第二十一次会议在京举行，深入学习贯彻党的二十届三中全会精神...</p>',
+        settings: ['recommend', 'top'],
+        publishType: 'now',
+        publishTime: '2026-06-01 10:30:00',
+        sortOrder: 100
+      },
+      {
+        id: 2,
+        title: '关于深化民族团结进步教育的实施意见',
+        subtitle: '铸牢中华民族共同体意识',
+        category: '政策文件',
+        tags: ['民族团结', '教育', '政策'],
+        author: '李四',
+        source: '国家民委',
+        sourceUrl: '',
+        cover: '',
+        summary: '为深入贯彻党的民族工作方针政策，进一步加强和改进民族团结进步教育工作，特制定本实施意见。',
+        content: '<p>关于深化民族团结进步教育的实施意见内容...</p>',
+        settings: [],
+        publishType: 'scheduled',
+        publishTime: '2026-06-02 14:20:00',
+        sortOrder: 90
+      },
+      {
+        id: 3,
+        title: '铸牢中华民族共同体意识专题研讨会成功举办',
+        subtitle: '',
+        category: '焦点话题',
+        tags: ['研讨会', '民族工作'],
+        author: '王五',
+        source: '中央民族大学',
+        sourceUrl: '',
+        cover: '',
+        summary: '铸牢中华民族共同体意识专题研讨会在京成功举办，与会专家学者围绕相关议题展开深入研讨。',
+        content: '<p>铸牢中华民族共同体意识专题研讨会内容...</p>',
+        settings: [],
+        publishType: 'now',
+        publishTime: '',
+        sortOrder: 80
+      },
+      {
+        id: 4,
+        title: '民族地区经济社会发展取得历史性成就',
+        subtitle: '脱贫攻坚与乡村振兴有效衔接',
+        category: '焦点话题',
+        tags: ['经济发展', '脱贫攻坚'],
+        author: '赵六',
+        source: '人民日报',
+        sourceUrl: 'https://example.com',
+        cover: '',
+        summary: '党的十八大以来，在党中央的坚强领导下，民族地区经济社会发展取得历史性成就，人民生活水平显著提高。',
+        content: '<p>民族地区经济社会发展内容...</p>',
+        settings: ['recommend'],
+        publishType: 'now',
+        publishTime: '2026-06-04 16:40:00',
+        sortOrder: 85
+      },
+      {
+        id: 5,
+        title: '推动新时代党的民族工作高质量发展',
+        subtitle: '',
+        category: '政策解读',
+        tags: ['民族工作', '高质量发展'],
+        author: '张三',
+        source: '',
+        sourceUrl: '',
+        cover: '',
+        summary: '推动新时代党的民族工作高质量发展，是贯彻落实党的二十大精神的重要举措。',
+        content: '<p>推动新时代党的民族工作高质量发展内容...</p>',
+        settings: [],
+        publishType: 'draft',
+        publishTime: '',
+        sortOrder: 75
+      }
+    ]
+
+    // 根据 ID 查找文章数据
+    const article = mockData.find(item => item.id === parseInt(articleId))
+
+    if (article) {
+      // 将数据回填到表单
+      Object.assign(form, {
+        title: article.title,
+        subtitle: article.subtitle || '',
+        tags: article.tags || [],
+        author: article.author,
+        source: article.source || '',
+        sourceUrl: article.sourceUrl || '',
+        cover: article.cover || '',
+        summary: article.summary,
+        content: article.content,
+        settings: article.settings || [],
+        publishType: article.publishType || 'now',
+        publishTime: article.publishTime || '',
+        sortOrder: article.sortOrder || 100
+      })
+    } else {
+      ElMessage.error('文章不存在')
+      router.back()
+    }
   }
 }
 
