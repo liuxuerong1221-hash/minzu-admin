@@ -153,11 +153,11 @@ const menuRoutes = computed(() => {
       ]
     },
     {
-      path: '/activities',
+      path: '/practice',
       meta: { title: '实践育人', icon: 'Suitcase' },
       children: [
-        { path: 'list', meta: { title: '活动列表', icon: 'List' } },
-        { path: 'registrations', meta: { title: '报名管理', icon: 'DocumentChecked' } }
+        { path: 'campus/list', meta: { title: '校园实践', icon: 'School' } },
+        { path: 'social/list', meta: { title: '社会实践', icon: 'OfficeBuilding' } }
       ]
     },
     {

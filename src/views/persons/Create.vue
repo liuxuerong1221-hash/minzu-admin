@@ -143,19 +143,11 @@
           <span style="font-weight: bold; font-size: 16px;">事迹材料</span>
         </el-divider>
 
-        <el-form-item label="主要事迹">
+        <el-form-item label="个人先进事迹" prop="deeds">
           <RichEditor
-            v-model="form.mainDeeds"
-            height="350px"
-            placeholder="请输入主要事迹（重点突出，500-1000字）"
-          />
-        </el-form-item>
-
-        <el-form-item label="详细故事">
-          <RichEditor
-            v-model="form.detailedStory"
-            height="450px"
-            placeholder="请输入详细故事（可分章节，不限字数）"
+            v-model="form.deeds"
+            height="500px"
+            placeholder="请输入个人先进事迹（可分章节详细描述）"
           />
         </el-form-item>
 
@@ -202,8 +194,7 @@ const form = reactive({
   phone: '',
   email: '',
   briefIntro: '',
-  mainDeeds: '',
-  detailedStory: '',
+  deeds: '',
   isRecommend: false,
   sortOrder: 100
 })
@@ -217,7 +208,8 @@ const rules = {
   briefIntro: [
     { required: true, message: '请输入简介', trigger: 'blur' },
     { min: 50, max: 200, message: '简介长度在 50 到 200 个字符', trigger: 'blur' }
-  ]
+  ],
+  deeds: [{ required: true, message: '请输入个人先进事迹', trigger: 'blur' }]
 }
 
 const handleAvatarChange = (file) => {

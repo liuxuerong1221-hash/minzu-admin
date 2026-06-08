@@ -70,25 +70,49 @@ const routes = [
             path: 'list',
             name: 'PersonList',
             component: () => import('@/views/persons/List.vue'),
-            meta: { title: '人物列表', icon: 'List' }
+            meta: { title: '先进个人', icon: 'List' }
           },
           {
             path: 'create',
             name: 'PersonCreate',
             component: () => import('@/views/persons/Create.vue'),
-            meta: { title: '新建人物', icon: 'UserFilled' }
+            meta: { title: '新建先进个人', icon: 'UserFilled', hidden: true }
           },
           {
             path: 'edit/:id',
             name: 'PersonEdit',
             component: () => import('@/views/persons/Create.vue'),
-            meta: { title: '编辑人物', icon: 'UserFilled', hidden: true }
+            meta: { title: '编辑先进个人', icon: 'UserFilled', hidden: true }
           },
           {
             path: 'detail/:id',
             name: 'PersonDetail',
             component: () => import('@/views/persons/Detail.vue'),
-            meta: { title: '人物详情', icon: 'View', hidden: true }
+            meta: { title: '先进个人详情', icon: 'View', hidden: true }
+          },
+          {
+            path: '/groups/list',
+            name: 'GroupList',
+            component: () => import('@/views/groups/List.vue'),
+            meta: { title: '先进集体', icon: 'OfficeBuilding' }
+          },
+          {
+            path: '/groups/create',
+            name: 'GroupCreate',
+            component: () => import('@/views/groups/Create.vue'),
+            meta: { title: '新建先进集体', icon: 'OfficeBuilding', hidden: true }
+          },
+          {
+            path: '/groups/edit/:id',
+            name: 'GroupEdit',
+            component: () => import('@/views/groups/Create.vue'),
+            meta: { title: '编辑先进集体', icon: 'OfficeBuilding', hidden: true }
+          },
+          {
+            path: '/groups/detail/:id',
+            name: 'GroupDetail',
+            component: () => import('@/views/groups/Detail.vue'),
+            meta: { title: '先进集体详情', icon: 'View', hidden: true }
           }
         ]
       },

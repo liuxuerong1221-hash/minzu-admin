@@ -1,13 +1,5 @@
 <template>
   <div class="person-list-container">
-    <!-- 类别标签切换 -->
-    <el-card class="category-tabs" shadow="never">
-      <el-radio-group v-model="activeCategory" size="large" @change="handleCategoryChange">
-        <el-radio-button label="先进个人">先进个人</el-radio-button>
-        <el-radio-button label="先进集体">先进集体</el-radio-button>
-      </el-radio-group>
-    </el-card>
-
     <!-- 搜索栏 -->
     <el-card class="search-card" shadow="never">
       <el-form :model="searchForm" inline>
@@ -83,7 +75,7 @@
     <!-- 列表视图 -->
     <el-card v-if="viewMode === 'table'" class="table-card" shadow="never">
       <el-table :data="tableData" v-loading="loading" stripe>
-        <el-table-column label="头像/标识" width="80">
+        <el-table-column label="头像" width="80">
           <template #default="{ row }">
             <el-avatar :size="50" :src="row.avatar">
               <el-icon><User /></el-icon>
@@ -91,26 +83,13 @@
           </template>
         </el-table-column>
 
-        <!-- 先进个人列 -->
-        <el-table-column v-if="activeCategory !== '先进集体'" prop="name" label="姓名" width="120" />
+        <el-table-column prop="name" label="姓名" width="120" />
 
-        <el-table-column v-if="activeCategory !== '先进集体'" label="基本信息" min-width="200">
+        <el-table-column label="基本信息" min-width="200">
           <template #default="{ row }">
             <div class="info-cell">
               <div>{{ row.gender }} · {{ row.ethnicity }} · {{ row.age }}岁</div>
               <div class="info-sub">{{ row.workUnit }}</div>
-            </div>
-          </template>
-        </el-table-column>
-
-        <!-- 先进集体列 -->
-        <el-table-column v-if="activeCategory === '先进集体'" prop="name" label="集体名称" width="200" />
-
-        <el-table-column v-if="activeCategory === '先进集体'" label="集体信息" min-width="250">
-          <template #default="{ row }">
-            <div class="info-cell">
-              <div>{{ row.workUnit || '单位名称' }}</div>
-              <div class="info-sub">{{ row.briefIntro || '集体简介' }}</div>
             </div>
           </template>
         </el-table-column>
@@ -187,17 +166,8 @@
               <div class="card-body">
                 <h3 class="person-name">{{ item.name }}</h3>
 
-                <!-- 先进个人信息 -->
-                <p v-if="activeCategory !== '先进集体'" class="person-info">
+                <p class="person-info">
                   {{ item.gender }} · {{ item.ethnicity }} · {{ item.age }}岁
-                </p>
-
-                <!-- 先进集体信息 -->
-                <p v-if="activeCategory === '先进集体'" class="person-info">
-                  {{ item.workUnit || '单位名称' }}
-                </p>
-                <p v-if="activeCategory === '先进集体'" class="person-brief">
-                  {{ item.briefIntro || '集体简介' }}
                 </p>
                 <p class="person-unit">{{ item.workUnit }}</p>
                 <el-divider />
@@ -243,7 +213,6 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const router = useRouter()
 const loading = ref(false)
 const viewMode = ref('table')
-const activeCategory = ref('先进个人')
 
 const searchForm = reactive({
   honorLevel: '',
@@ -337,20 +306,11 @@ const tableData = ref([
   }
 ])
 
-// 类别切换
-const handleCategoryChange = () => {
-  pagination.page = 1
-  fetchData()
-}
-
 const fetchData = () => {
   loading.value = true
   setTimeout(() => {
-    // 根据activeCategory过滤数据
-    let filteredData = [...mockData]
-    if (activeCategory.value) {
-      filteredData = filteredData.filter(item => item.category === activeCategory.value)
-    }
+    // 仅显示先进个人
+    const filteredData = mockData.filter(item => item.category === '先进个人')
     tableData.value = filteredData
     pagination.total = filteredData.length
     loading.value = false
@@ -444,7 +404,6 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  activeCategory.value = '先进个人'
   searchForm.honorLevel = ''
   searchForm.ethnicity = ''
   searchForm.keyword = ''
@@ -496,22 +455,6 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .person-list-container {
-  .category-tabs {
-    margin-bottom: 20px;
-    border-radius: 8px;
-
-    :deep(.el-radio-button__inner) {
-      padding: 12px 24px;
-      font-size: 15px;
-      font-weight: 500;
-    }
-
-    :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-      background-color: #A70101;
-      border-color: #A70101;
-    }
-  }
-
   .search-card,
   .toolbar-card,
   .table-card {
